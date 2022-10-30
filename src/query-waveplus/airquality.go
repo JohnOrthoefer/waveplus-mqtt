@@ -64,7 +64,51 @@ func (w waveplusData)co2Quality() AirQuality {
    return Unknown
 }
 
+func (w waveplusData)humidityQuality() AirQuality {
+   if !w.valid {
+      return Unknown
+   }
 
+   v := w.humidity
+
+   if v >=30 && v < 60 {
+      return Good
+   }
+   if (v >= 60 && v < 70) || (v >= 25 && v < 30) {
+      return Fair
+   }
+   if v >= 70 || v < 25 {
+      return Poor
+   }
+   return Unknown
+}
+
+func (w waveplusData)temperatureQuality() AirQuality {
+   if !w.valid {
+      return Unknown
+   }
+
+   if w.temperature < 64 {
+      return Good
+   }
+   if w.temperature >= 64 && w.temperature < 77 {
+      return Fair
+   }
+   if w.temperature >= 77 {
+      return Poor
+   }
+   return Unknown
+}
+
+func (w waveplusData)Quality() AirQuality {
+   if !w.valid {
+      return Unknown
+   }
+
+   
+
+   return Good
+}
 
 func (a AirQuality)String() string {
    switch a {

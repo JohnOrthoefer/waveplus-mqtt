@@ -63,7 +63,7 @@ func (w *waveplus) getMonitorValues() {
       return
    }
 
-   log.Printf("%d: quering\n", w.sn)
+   //log.Printf("%d: quering\n", w.sn)
    w.data.valid = false
 
    var adapter = bluetooth.DefaultAdapter

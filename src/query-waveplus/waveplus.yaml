@@ -1,5 +1,5 @@
 timeout: 30
-frequancy: 20
+frequancy: 90
 mqtt:
    - url: tcp://mera.orthoefer.org:1883
 

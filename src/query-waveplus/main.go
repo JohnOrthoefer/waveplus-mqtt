@@ -9,6 +9,8 @@ import (
 func main() {
    var mon []*waveplus
 
+   log.Printf("# %s - %s @%s\n", repoName, sha1ver, buildTime)
+
    for _, v := range os.Args[1:] {
       mon = append(mon, newMonitor(v, v))
    }

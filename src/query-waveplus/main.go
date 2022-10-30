@@ -9,12 +9,20 @@ import (
 func main() {
    var mon []*waveplus
 
-   if len(os.Args) < 2 {
-      log.Fatal("no params")
-   }
-   
    for _, v := range os.Args[1:] {
       mon = append(mon, newMonitor(v))
+   }
+
+   c := ReadYAML()
+
+   log.Printf("yaml: %q", c)
+   for _, v := range c.Monitors() {
+      log.Printf("Serial: %s", v.SerialNumber())
+      mon = append(mon, newMonitor(v.SerialNumber()))
+   }
+
+   if len(mon) < 1 {
+      log.Fatal("Nothing to monitor")
    }
 
    waitTime := time.Second * 30
@@ -28,7 +36,6 @@ func main() {
          v.getMonitorValues()
          v.printMonitorValues()
       }
-      log.Printf("Waiting...")
       time.Sleep(time.Until(thisRun.Add(waitTime)))
    }
 }

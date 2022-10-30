@@ -1,0 +1,57 @@
+package main
+
+import (
+   "log"
+   "fmt"
+   "os"
+   "gopkg.in/yaml.v3"
+)
+
+type Configuration struct {
+   Freq     uint              `yaml:"frequency"`
+   Timeout  uint              `yaml:"timeout"`
+   Mqtt     []MqttRecord      `yaml:"mqtt"`
+   Monitor  []MonitorRecord   `yaml:"monitor"`
+}
+
+type MqttRecord struct {
+   Url      string            `yaml:"url"`
+}
+
+type MonitorRecord struct {
+   Location string            `yaml:"location"`
+   Serial   uint              `yaml:"serialnumber"`
+   Mac      string            `yaml:"macaddr"`
+   Topic    string            `yaml:"topic"`
+}
+
+func ReadYAML() *Configuration {
+   conf := Configuration {
+      Freq: 60,
+      Timeout: 60, 
+      Mqtt: nil,
+      Monitor: nil,
+   }
+
+   yamlFile, err := os.ReadFile("waveplus.yaml")
+   if err != nil {
+      log.Printf("YAML Configuration, %s", err)
+      return nil
+   }
+
+   err = yaml.Unmarshal(yamlFile, &conf)
+   if err != nil {
+      log.Printf("YAML Parse Error, %s", err)
+      return nil
+   }
+
+   return &conf
+}
+
+func (c *Configuration) Monitors() []MonitorRecord {
+   return c.Monitor
+}
+
+func (m MonitorRecord) SerialNumber() string {
+   return fmt.Sprintf("%d", m.Serial)
+}

@@ -75,7 +75,7 @@ func (w *waveplus) getMonitorValues() {
       log.Printf("%d: Failed to Connect", w.sn)
       return
    }
-   
+
 	srvcs, err := device.DiscoverServices(nil)
    if err != nil {
       log.Printf("Failed discover service %s\n", err)
@@ -105,12 +105,14 @@ func (w *waveplus) printMonitorValues() {
    if !w.data.valid {
       return
    }
-   log.Printf("%d: %3.1f pCi/L, %3.1f pCi/L, %4.0f ppb, %4.0f ppm\n", 
+   log.Printf("%d: Radon- Short %3.1f pCi/L(%s), Long %3.1f pCi/L(%s)\n",
       w.sn, 
-      convert2pCiL(w.data.radonShort), 
-      convert2pCiL(w.data.radonLong), 
-      w.data.vocLvl,
-      w.data.co2Lvl)
+      convert2pCiL(w.data.radonShort), w.data.radonShortQuality().String(),
+      convert2pCiL(w.data.radonLong), w.data.radonLongQuality().String())
+   log.Printf("%d: VOC- %4.0f ppb(%s) CO2- %4.0f ppm(%s)\n", 
+      w.sn, 
+      w.data.vocLvl, w.data.vocQuality().String(),
+      w.data.co2Lvl, w.data.co2Quality().String())
 
    log.Printf("%d: %3.1f %%rH, %5.1f F, %4.0f hPa\n", 
       w.sn, 

@@ -9,6 +9,7 @@ type waveplus struct {
    sn    uint
    mac   bluetooth.Addresser
    data  waveplusData 
+   rssi  int16
 }
 
 type waveplusData struct {
@@ -22,3 +23,12 @@ type waveplusData struct {
    co2Lvl float32         // ppm
    vocLvl float32         // ppb
 }
+
+type AirQuality uint64
+
+const (
+   Unknown AirQuality = iota
+   Good
+   Fair
+   Poor
+)

@@ -6,6 +6,7 @@ import (
 )
 
 type waveplus struct {
+   location string
    sn    uint
    mac   bluetooth.Addresser
    data  waveplusData 

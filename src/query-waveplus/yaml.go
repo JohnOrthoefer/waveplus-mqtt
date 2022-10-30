@@ -4,6 +4,7 @@ import (
    "log"
    "fmt"
    "os"
+   "time"
    "gopkg.in/yaml.v3"
 )
 
@@ -54,4 +55,19 @@ func (c *Configuration) Monitors() []MonitorRecord {
 
 func (m MonitorRecord) SerialNumber() string {
    return fmt.Sprintf("%d", m.Serial)
+}
+
+func (m MonitorRecord) GetLocation() string {
+   if m.Location == "" {
+      return m.SerialNumber()
+   }
+   return m.Location
+}
+
+func (c *Configuration) GetFrequency() time.Duration {
+   return time.Second * time.Duration(c.Freq)
+}
+
+func (c *Configuration) GetTimeout() time.Duration {
+   return time.Second * time.Duration(c.Timeout)
 }

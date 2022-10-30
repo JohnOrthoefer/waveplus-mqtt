@@ -9,7 +9,7 @@ import (
 
 // 
 // 
-func newMonitor(m string) *waveplus {
+func newMonitor(m string, l string) *waveplus {
    var rtn waveplus
 
    if len(m) == 0 {
@@ -21,6 +21,11 @@ func newMonitor(m string) *waveplus {
    } else {
       return nil
    }
+
+   if l == "" {
+      l = m
+   }
+   rtn.location = l
       
    return &rtn
 }
@@ -30,7 +35,7 @@ func (w *waveplus) getMonitorMAC(wait time.Duration) {
 
    must("enable BLE stack", adapter.Enable())
 
-   log.Printf("%d: Searching for monitor", w.sn)
+   log.Printf("%d: Searching for monitor, %s", w.sn, w.location)
 
    timeout := time.Now().Add(wait)
 	err := adapter.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {

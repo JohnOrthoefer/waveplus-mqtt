@@ -17,7 +17,10 @@ func main() {
       mon = append(mon, newMonitor(v))
    }
 
+   waitTime := time.Second * 30
+
    for {
+      thisRun := time.Now()
       for _, v := range mon {
          if !v.ready() {
             v.getMonitorMAC(time.Second * 30)
@@ -25,6 +28,7 @@ func main() {
          v.getMonitorValues()
          v.printMonitorValues()
       }
-      time.Sleep(time.Second *10)
+      log.Printf("Waiting...")
+      time.Sleep(time.Until(thisRun.Add(waitTime)))
    }
 }

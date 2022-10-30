@@ -15,9 +15,7 @@ func main() {
 
    c := ReadYAML()
 
-   log.Printf("yaml: %q", c)
    for _, v := range c.Monitors() {
-      log.Printf("Serial: %s", v.SerialNumber())
       mon = append(mon, newMonitor(v.SerialNumber()))
    }
 

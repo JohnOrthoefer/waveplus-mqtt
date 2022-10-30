@@ -30,12 +30,12 @@ func (w *waveplus) getMonitorMAC(wait time.Duration) {
 
    must("enable BLE stack", adapter.Enable())
 
+   log.Printf("%d: Searching for monitor", w.sn)
+
    timeout := time.Now().Add(wait)
 	err := adapter.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
-		log.Printf("found device: %s, %d", result.Address.String(), result.RSSI)
-
       if v, ok := (result.ManufacturerData())[0x0334]; ok {
-         log.Printf("Found ManufacturerData, (%d == %d)\n", getSerialNumber(v[0:4]), w.sn)
+         // log.Printf("Found ManufacturerData, (%d == %d)\n", getSerialNumber(v[0:4]), w.sn)
          if getSerialNumber(v[0:4]) ==  w.sn {
             w.mac = result.Address
 			   adapter.StopScan()
@@ -59,7 +59,7 @@ func (w *waveplus) ready() bool {
 
 func (w *waveplus) getMonitorValues() {
    if !w.ready() {
-      log.Printf("Not ready %d", w.sn)
+      log.Printf("%d: Not ready", w.sn)
       return
    }
 

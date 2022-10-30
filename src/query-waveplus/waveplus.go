@@ -4,38 +4,33 @@ import (
    "log"
    "time"
    "strconv"
-   "errors"
    "tinygo.org/x/bluetooth"
 )
 
-func getMonitors(m []string) []*waveplus {
-
-   var rtn []*waveplus
+// 
+// 
+func newMonitor(m string) *waveplus {
+   var rtn waveplus
 
    if len(m) == 0 {
       log.Fatal("Needs a Serial Number")
    }
 
-   for _, v := range m {
-      var w waveplus
-      if s, err := strconv.ParseUint(v, 10, 32); err == nil {
-         w.sn = uint(s)
-      } else {
-         continue
-      }
-      
-      rtn = append(rtn, &w)
+   if s, err := strconv.ParseUint(m, 10, 32); err == nil {
+      rtn.sn = uint(s)
+   } else {
+      return nil
    }
-
-   return rtn
+      
+   return &rtn
 }
 
-func (w *waveplus) getMonitorMAC() {
+func (w *waveplus) getMonitorMAC(wait time.Duration) {
    var adapter = bluetooth.DefaultAdapter
 
    must("enable BLE stack", adapter.Enable())
 
-   timeout := time.Now().Add(time.Minute)
+   timeout := time.Now().Add(wait)
 	err := adapter.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
 		log.Printf("found device: %s, %d", result.Address.String(), result.RSSI)
 
@@ -55,8 +50,15 @@ func (w *waveplus) getMonitorMAC() {
    }
 }
 
-func (w *waveplus) getMonitorValues() {
+func (w *waveplus) ready() bool {
    if w.mac == nil {
+      return false
+   }
+   return true
+}
+
+func (w *waveplus) getMonitorValues() {
+   if !w.ready() {
       log.Printf("Not ready %d", w.sn)
       return
    }
@@ -160,29 +162,4 @@ func updateData(d []byte) waveplusData {
    rtn.vocLvl = convData(d[14:16]) 
 
    return rtn
-}
-
-func conv2radon(d float32) (float32, error) {
-   if d >= 0 || d <= 16383  {
-      return d, nil
-   }
-   return -1, errors.New("Radon measurement invalid")
-}
-
-func convData(d []byte) float32 {
-   //val := binary.BigEndian.Uint64(d)
-
-   val := (uint(d[0]))
-   val |= (uint(d[1])<<8)
-   
-//   log.Printf("convData(%q) = %d\n", d, val)
-   return float32(val)
-}
-
-func convert2pCiL(v float32) float32 {
-   return v/37.0
-}
-
-func convert2F(v float32) float32 {
-   return (v * 9.0 / 5.0 ) + 32.0
 }

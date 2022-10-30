@@ -2,19 +2,26 @@ package main
 
 import (
    "os"
+   "log"
    "time"
 )
 
 func main() {
+   var mon []*waveplus
 
-   mon := getMonitors(os.Args[1:])
+   if len(os.Args) < 2 {
+      log.Fatal("no params")
+   }
    
-   for _, v := range mon {
-      v.getMonitorMAC()
+   for _, v := range os.Args[1:] {
+      mon = append(mon, newMonitor(v))
    }
 
    for {
       for _, v := range mon {
+         if !v.ready() {
+            v.getMonitorMAC(time.Second * 30)
+         }
          v.getMonitorValues()
          v.printMonitorValues()
       }

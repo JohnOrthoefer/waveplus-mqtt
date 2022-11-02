@@ -17,6 +17,10 @@ func main() {
 
    c := ReadYAML()
 
+   if !c.TimeStampsEnabled() {
+      log.SetFlags(0)
+   }
+
    for _, v := range c.Monitors() {
       mon = append(mon, newMonitor(v.SerialNumber(), v.GetLocation()))
    }

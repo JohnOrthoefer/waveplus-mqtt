@@ -1,6 +1,6 @@
 package main
 
-func radon(v float32) AirQuality {
+func radon(v float32) AirQualityType {
    v = convert2pCiL(v)
 
    if v < 2.7 {
@@ -16,21 +16,21 @@ func radon(v float32) AirQuality {
    return Unknown
 }
 
-func (w waveplusData)radonShortQuality() AirQuality {
+func (w waveplusData)radonShortQuality() AirQualityType {
    if !w.valid {
       return Unknown
    }
    return radon(w.radonShort)
 }
 
-func (w waveplusData)radonLongQuality() AirQuality {
+func (w waveplusData)radonLongQuality() AirQualityType {
    if !w.valid {
       return Unknown
    }
    return radon(w.radonLong)
 }
 
-func (w waveplusData)vocQuality() AirQuality {
+func (w waveplusData)vocQuality() AirQualityType {
    if !w.valid {
       return Unknown
    }
@@ -47,7 +47,7 @@ func (w waveplusData)vocQuality() AirQuality {
    return Unknown
 }
 
-func (w waveplusData)co2Quality() AirQuality {
+func (w waveplusData)co2Quality() AirQualityType {
    if !w.valid {
       return Unknown
    }
@@ -64,7 +64,7 @@ func (w waveplusData)co2Quality() AirQuality {
    return Unknown
 }
 
-func (w waveplusData)humidityQuality() AirQuality {
+func (w waveplusData)humidityQuality() AirQualityType {
    if !w.valid {
       return Unknown
    }
@@ -83,7 +83,7 @@ func (w waveplusData)humidityQuality() AirQuality {
    return Unknown
 }
 
-func (w waveplusData)temperatureQuality() AirQuality {
+func (w waveplusData)temperatureQuality() AirQualityType {
    if !w.valid {
       return Unknown
    }
@@ -100,24 +100,26 @@ func (w waveplusData)temperatureQuality() AirQuality {
    return Unknown
 }
 
-func (w waveplusData)Quality() AirQuality {
+func (w waveplusData)Quality() AirQualityType {
    if !w.valid {
       return Unknown
    }
 
-   
-
    return Good
 }
 
-func (a AirQuality)String() string {
+func (a AirQualityType)String() string {
    switch a {
    case Poor:
       return "Poor"
+   case Inferior:
+      return "Inferior"
    case Fair:
       return "Fair"
    case Good:
       return "Good"
+   case Excellent:
+      return "Excellent"
    }
    return "unknown"
 }

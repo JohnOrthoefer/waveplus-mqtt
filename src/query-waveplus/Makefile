@@ -1,4 +1,4 @@
-SRC=airquality.go build.go convert.go main.go must.go serialnum.go type.go util.go waveplus.go yaml.go
+SRC=airquality.go build.go convert.go main.go must.go serialnum.go type.go util.go waveplus.go yaml.go mqtt.go getFloat.go
 EXECNAME=waveplus_mqtt
 GOLANG=/usr/bin/go
 CURL=/usr/bin/curl

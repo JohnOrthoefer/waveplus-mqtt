@@ -7,9 +7,10 @@ import (
 
 type waveplus struct {
    location string
-   sn    uint
-   mac   bluetooth.Addresser
-   data  waveplusData 
+   sn       uint
+   mac      bluetooth.Addresser
+   data     waveplusData 
+   samples  uint64
    rssi  int16
 }
 
@@ -25,11 +26,13 @@ type waveplusData struct {
    vocLvl float32         // ppb
 }
 
-type AirQuality uint64
+type AirQualityType uint64
 
 const (
-   Unknown AirQuality = iota
+   Unknown AirQualityType = iota
+   Excellent
    Good
    Fair
+   Inferior
    Poor
 )

@@ -99,6 +99,9 @@ func (w *waveplus) getMonitorValues() {
                continue
             }
             w.data = updateData(buf)
+            if w.data.valid {
+               w.samples += 1
+            }
          }
       }
    }
@@ -124,6 +127,7 @@ func (w *waveplus) printMonitorValues() {
       w.data.humidity, 
       convert2F(w.data.temperature),
       w.data.pressure)
+   log.Printf("%d: %d samples\n", w.sn, w.samples)
 }
 
 func updateData(d []byte) waveplusData {

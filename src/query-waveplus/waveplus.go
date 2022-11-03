@@ -1,6 +1,7 @@
 package main
 
 import (
+   "fmt"
    "log"
    "time"
    "strconv"
@@ -9,7 +10,7 @@ import (
 
 // 
 // 
-func newMonitor(m string, l string) *waveplus {
+func newMonitor(m string) *waveplus {
    var rtn waveplus
 
    if len(m) == 0 {
@@ -21,13 +22,17 @@ func newMonitor(m string, l string) *waveplus {
    } else {
       return nil
    }
+   
+   rtn.location = m
 
-   if l == "" {
-      l = m
-   }
-   rtn.location = l
-      
    return &rtn
+}
+
+func (m *waveplus) setLocation(l string) {
+   if l == "" {
+      return
+   }
+   m.location = l
 }
 
 func (w *waveplus) getMonitorMAC(wait time.Duration) {
@@ -62,10 +67,10 @@ func (w *waveplus) ready() bool {
    return true
 }
 
-func (w *waveplus) getMonitorValues() {
+func (w *waveplus) getMonitorValues() bool {
    if !w.ready() {
       log.Printf("%d: Not ready", w.sn)
-      return
+      return false
    }
 
    //log.Printf("%d: quering\n", w.sn)
@@ -78,13 +83,13 @@ func (w *waveplus) getMonitorValues() {
 	device, err := adapter.Connect(w.mac, bluetooth.ConnectionParams{})
    if err != nil {
       log.Printf("%d: Failed to Connect", w.sn)
-      return
+      return false
    }
 
 	srvcs, err := device.DiscoverServices(nil)
    if err != nil {
       log.Printf("Failed discover service %s\n", err)
-      return
+      return false
    }
 
    for _, srvc := range srvcs {
@@ -107,6 +112,7 @@ func (w *waveplus) getMonitorValues() {
    }
 
    device.Disconnect()
+   return w.data.valid
 }
 
 func (w *waveplus) printMonitorValues() {
@@ -130,7 +136,17 @@ func (w *waveplus) printMonitorValues() {
    log.Printf("%d: %s, %d samples\n", w.sn, w.data.Quality().String(), w.samples)
 }
 
+func (w *waveplus) setMQTTTopic(s string) {
+   if s == "" {
+      s = fmt.Sprintf("tele/%d", w.sn)
+   }
+   w.mqttTopic = s
+}
+
 func (w *waveplus) getMQTTTopic() string {
+   if w.mqttTopic == "" {
+      w.setMQTTTopic("")
+   }
    return w.mqttTopic
 }
 

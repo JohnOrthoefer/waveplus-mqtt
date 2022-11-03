@@ -92,6 +92,7 @@ func inHg2hPa(inHgStr string)string {
 }
 
 func newMQTT(broker string) *wavePlusMQTT {
+   log.Printf("Broker: %s", broker)
    opts := mqtt.NewClientOptions().AddBroker(broker)
    mqttClient := wavePlusMQTT {
       m:  mqtt.NewClient(opts),
@@ -134,5 +135,7 @@ func (m *wavePlusMQTT) publish(v *waveplus) {
 
    jsonOut, _ := json.Marshal(AirQuality)
    //fmt.Printf("%s\n", jsonOut)
-   m.m.Publish(v.getMQTTTopic(), 0, false, jsonOut)
+   log.Printf("Publishing to %s", v.getMQTTTopic())
+   token := m.m.Publish(fmt.Sprintf("%s/sample", v.getMQTTTopic()), 0, false, jsonOut)
+   token.Wait()
 }

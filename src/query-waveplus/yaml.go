@@ -12,12 +12,8 @@ type Configuration struct {
    Freq     uint              `yaml:"frequency"`
    Timeout  uint              `yaml:"timeout"`
    TSEnabled bool             `yaml:"timestamps"`
-   Mqtt     []MqttRecord      `yaml:"mqtt"`
+   MqttURL   string      `yaml:"mqtturl"`
    Monitor  []MonitorRecord   `yaml:"monitor"`
-}
-
-type MqttRecord struct {
-   Url      string            `yaml:"url"`
 }
 
 type MonitorRecord struct {
@@ -32,7 +28,7 @@ func ReadYAML() *Configuration {
       Freq: 60,
       Timeout: 60, 
       TSEnabled: true,
-      Mqtt: nil,
+      MqttURL: "",
       Monitor: nil,
    }
 
@@ -65,7 +61,7 @@ func (m MonitorRecord) SerialNumber() string {
 
 func (m MonitorRecord) GetMqttTopic() string {
    if m.Topic == "" {
-      return fmt.Sprintf("tele/%d", m.SerialNumber())
+      return fmt.Sprintf("tele/%s", m.SerialNumber())
    }
    return m.Topic
 }
@@ -83,5 +79,13 @@ func (c *Configuration) GetFrequency() time.Duration {
 
 func (c *Configuration) GetTimeout() time.Duration {
    return time.Second * time.Duration(c.Timeout)
+}
+
+func (c *Configuration) GetBroker() string {
+   rtn := c.MqttURL
+   if rtn == "" {
+      return "tcp://localhost:1883"
+   }
+   return rtn
 }
 

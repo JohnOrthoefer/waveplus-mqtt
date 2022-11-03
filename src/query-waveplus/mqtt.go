@@ -23,6 +23,7 @@ type (
 
       // floating point number in units of parts per million
       CarbonDioxideLevel      float32 `json:"carbondioxidelevel,omitempty"`
+      CarbonDioxideQuality    string  `json:"carbondioxidequality,omitempty"`
 
       // micrograms per cubic meter
       PM10Density             float32 `json:"pm10density,omitempty"`
@@ -41,12 +42,15 @@ type (
 
       // micrograms per cubic meter
       VOCDensity              float32 `json:"vocdensity,omitempty"`
+      VOCQuality              string `json:"vocquality,omitempty"`
 
       // floating point number in units of parts per million
       CarbonMonoxideLevel     float32 `json:"carbonmonoxidelevel,omitempty"`
+      CarbonMonoxideQuality   string  `json:"carbonmonoxidequality,omitempty"`
 
       // micrograms per cubic meter
       AirQualityPPM           float32 `json:"airqualityppm,omitempty"`
+
       StatusActive            bool   `json:"active,omitempty"`
       StatusFault             bool   `json:"fault,omitempty"` 
       StatusTampered          bool   `json:"tampered,omitempty"`
@@ -60,7 +64,9 @@ type (
 
       // Not in Homekit/HomeBridge
       RadonShortTerm       float32  `json:"radonshort.omitempty`
+      RadonShortQuality    string   `json:"radonshortquality.omitempty`
       RadonLongTerm        float32  `json:"radonlong.omitempty`
+      RadonLongQuality     string   `json:"radonlongquality.omitempty`
    }
    wavePlusMQTT struct {
       m mqtt.Client
@@ -132,11 +138,15 @@ func (m *wavePlusMQTT) publish(v *waveplus) {
    AirQuality := AirQualityStruct{
       OverallAirQuality: v.data.Quality().HKString(),
       CarbonDioxideLevel: v.data.co2Lvl,
+      CarbonDioxideQuality: v.data.co2Quality().HKString(),
       VOCDensity: vocPPM2mgPm3(v.data.vocLvl),
+      VOCQuality: v.data.vocQuality().HKString(),
       CurrentTemperature: v.data.temperature,
       CurrentRelativeHumidity: v.data.humidity,
       RadonShortTerm: v.data.radonShort,
+      RadonShortQuality: v.data.radonShortQuality().HKString(),
       RadonLongTerm: v.data.radonLong,
+      RadonLongQuality: v.data.radonLongQuality().HKString(),
    }
 
    jsonOut, _ := json.Marshal(AirQuality)

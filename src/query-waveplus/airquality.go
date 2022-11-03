@@ -117,8 +117,8 @@ func (w waveplusData)Quality() AirQualityType {
 
    rtn := w.radonShortQuality().AirQualityComp(w.vocQuality())
    rtn  = rtn.AirQualityComp(w.co2Quality())
-   rtn  = rtn.AirQualityComp(w.humidityQuality())
-   rtn  = rtn.AirQualityComp(w.temperatureQuality())
+   //rtn  = rtn.AirQualityComp(w.humidityQuality())
+   //rtn  = rtn.AirQualityComp(w.temperatureQuality())
    
    return rtn
 }
@@ -167,3 +167,18 @@ func (a AirQualityType)String() string {
    return "unknown"
 }
 
+func (a AirQualityType)HKString() string {
+   switch a {
+   case Poor:
+      return "POOR"
+   case Inferior:
+      return "INFERIOR"
+   case Fair:
+      return "FAIR"
+   case Good:
+      return "GOOD"
+   case Excellent:
+      return "EXCELLENT"
+   }
+   return "UNKNOWN"
+}

@@ -57,6 +57,10 @@ type (
 
       // floating point percentage representing the current relative humidity.
       CurrentRelativeHumidity float32 `json:"relativehumidit,omitempty"`
+
+      // Not in Homekit/HomeBridge
+      RadonShortTerm       float32  `json:"radonshort.omitempty`
+      RadonLongTerm        float32  `json:"radonlong.omitempty`
    }
    wavePlusMQTT struct {
       m mqtt.Client
@@ -126,16 +130,18 @@ func (m *wavePlusMQTT) publish(v *waveplus) {
       return
    }
    AirQuality := AirQualityStruct{
-      OverallAirQuality: v.data.Quality().String(),
+      OverallAirQuality: v.data.Quality().HKString(),
       CarbonDioxideLevel: v.data.co2Lvl,
       VOCDensity: vocPPM2mgPm3(v.data.vocLvl),
       CurrentTemperature: v.data.temperature,
       CurrentRelativeHumidity: v.data.humidity,
+      RadonShortTerm: v.data.radonShort,
+      RadonLongTerm: v.data.radonLong,
    }
 
    jsonOut, _ := json.Marshal(AirQuality)
    //fmt.Printf("%s\n", jsonOut)
-   log.Printf("Publishing to %s", v.getMQTTTopic())
+   log.Printf("%d: Publishing to %s", v.sn, v.getMQTTTopic())
    token := m.m.Publish(fmt.Sprintf("%s/sample", v.getMQTTTopic()), 0, false, jsonOut)
    token.Wait()
 }

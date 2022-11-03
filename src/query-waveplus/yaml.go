@@ -63,6 +63,13 @@ func (m MonitorRecord) SerialNumber() string {
    return fmt.Sprintf("%d", m.Serial)
 }
 
+func (m MonitorRecord) GetMqttTopic() string {
+   if m.Topic == "" {
+      return fmt.Sprintf("tele/%d", m.SerialNumber())
+   }
+   return m.Topic
+}
+
 func (m MonitorRecord) GetLocation() string {
    if m.Location == "" {
       return m.SerialNumber()
@@ -77,3 +84,4 @@ func (c *Configuration) GetFrequency() time.Duration {
 func (c *Configuration) GetTimeout() time.Duration {
    return time.Second * time.Duration(c.Timeout)
 }
+

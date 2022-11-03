@@ -9,6 +9,7 @@ type waveplus struct {
    location string
    sn       uint
    mac      bluetooth.Addresser
+   mqttTopic   string
    data     waveplusData 
    samples  uint64
    rssi  int16

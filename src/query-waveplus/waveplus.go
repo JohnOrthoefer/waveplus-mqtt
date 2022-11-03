@@ -127,7 +127,11 @@ func (w *waveplus) printMonitorValues() {
       w.data.humidity, 
       convert2F(w.data.temperature),
       w.data.pressure)
-   log.Printf("%d: %d samples\n", w.sn, w.samples)
+   log.Printf("%d: %s, %d samples\n", w.sn, w.data.Quality().String(), w.samples)
+}
+
+func (w *waveplus) getMQTTTopic() string {
+   return w.mqttTopic
 }
 
 func updateData(d []byte) waveplusData {

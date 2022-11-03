@@ -2,9 +2,10 @@ package main
 
 import (
    "fmt"
+   "log"
    "strings"
    "encoding/json"
-   "net/url"
+//   "net/url"
    "github.com/eclipse/paho.mqtt.golang"
 )
 
@@ -21,50 +22,50 @@ type (
       OverallAirQuality       string `json:"airquality,omitempty"`
 
       // floating point number in units of parts per million
-      CarbonDioxideLevel      float64 `json:"carbondioxidelevel,omitempty"`
+      CarbonDioxideLevel      float32 `json:"carbondioxidelevel,omitempty"`
 
       // micrograms per cubic meter
-      PM10Density             float64 `json:"pm10density,omitempty"`
+      PM10Density             float32 `json:"pm10density,omitempty"`
 
       // micrograms per cubic meter
-      PM2_5Density            float64 `json:"pm2_5density,omitempty"`
+      PM2_5Density            float32 `json:"pm2_5density,omitempty"`
 
       // micrograms per cubic meter
-      OzoneDensity            float64 `json:"ozonedensity,omitempty"`
+      OzoneDensity            float32 `json:"ozonedensity,omitempty"`
 
       // micrograms per cubic meter
-      NitrogenDioxideDensity  float64 `json:"nitrogendioxidedensity,omitempty"`
+      NitrogenDioxideDensity  float32 `json:"nitrogendioxidedensity,omitempty"`
 
       // micrograms per cubic meter
-      SulphurDioxideDensity   float64 `json:"sulphurdioxidedensity,omitempty"`
+      SulphurDioxideDensity   float32 `json:"sulphurdioxidedensity,omitempty"`
 
       // micrograms per cubic meter
-      VOCDensity              float64 `json:"vocdensity,omitempty"`
+      VOCDensity              float32 `json:"vocdensity,omitempty"`
 
       // floating point number in units of parts per million
-      CarbonMonoxideLevel     float64 `json:"carbonmonoxidelevel,omitempty"`
+      CarbonMonoxideLevel     float32 `json:"carbonmonoxidelevel,omitempty"`
 
       // micrograms per cubic meter
-      AirQualityPPM           float64 `json:"airqualityppm,omitempty"`
+      AirQualityPPM           float32 `json:"airqualityppm,omitempty"`
       StatusActive            bool   `json:"active,omitempty"`
       StatusFault             bool   `json:"fault,omitempty"` 
       StatusTampered          bool   `json:"tampered,omitempty"`
       StatusLowBattery        bool   `json:"lowbattery,omitempty"`
 
       // floating point number in degrees Celsius
-      CurrentTemperature      string `json:"temperature,omitempty"`
+      CurrentTemperature      float32 `json:"temperature,omitempty"`
 
       // floating point percentage representing the current relative humidity.
-      CurrentRelativeHumidity float64 `json:"relativehumidit,omitempty"`
+      CurrentRelativeHumidity float32 `json:"relativehumidit,omitempty"`
+   }
+   wavePlusMQTT struct {
+      m mqtt.Client
    }
 )
 
-var (
-   AirQuality AirQualityType
-   mqttClient mqtt.Client
-   mqttTopic  string
-)
-
+func vocPPM2mgPm3(ppm float32) float32 {
+   return ppm * 0.0409 * 100
+}
 
 func deg2C(degF string)string {
    c := (getFloat(degF)-32.0) * 5/9
@@ -90,30 +91,16 @@ func inHg2hPa(inHgStr string)string {
    return fmt.Sprintf("%d", hPa)
 }
 
-func setTopic(t string) {
-   mqttTopic = t
-}
-
-func getTopic(v url.Values) string {
-   rtn := mqttTopic
-/*
-   for _, val := range []string{"ID", "softwaretype", "id", "mt", "sensor"} {
-      rtn = strings.Replace(rtn, fmt.Sprintf("%%%s%%", val), v.Get(val), -1)
-   }
-*/
-   //fmt.Printf("Topic: %s => %s\n", mqttTopic, rtn)
-   return rtn
-}
-
-func mqttSetup(broker string, topic string) {
+func newMQTT(broker string) *wavePlusMQTT {
    opts := mqtt.NewClientOptions().AddBroker(broker)
-   mqttClient = mqtt.NewClient(opts)
-   if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
-      mqttClient = nil
-      fmt.Printf("%s\n", token.Error())
-      return
+   mqttClient := wavePlusMQTT {
+      m:  mqtt.NewClient(opts),
    }
-   setTopic(topic)
+   if token := mqttClient.m.Connect(); token.Wait() && token.Error() != nil {
+      log.Printf("%s\n", token.Error())
+      return nil
+   }
+   return &mqttClient
 }
 
 func batteryLow(s string) bool {
@@ -133,24 +120,19 @@ func mph2kph(mph string) string {
    return fmt.Sprintf("%.0f", kph)
 }
 
-func publish(v url.Values) {
-   if mqttClient == nil {
+func (m *wavePlusMQTT) publish(v *waveplus) {
+   if m.m  == nil {
       return
    }
    AirQuality := AirQualityStruct{
-/*
-      Temperature:   deg2C(v.Get("tempf")),
-      Humidity:      v.Get("humidity"),
-      AirPressure:   inHg2hPa(v.Get("baromin")),
-      Rain1h:        inch2mm(v.Get("rainin")),
-      Rain24h:       inch2mm(v.Get("dailyrainin")),
-      WindDirection: v.Get("winddir"),
-      WindSpeed:     mph2kph(v.Get("windspeedmph")),
-      Battery:       batteryLow(v.Get("sensorbattery")),
-*/
+      OverallAirQuality: v.data.Quality().String(),
+      CarbonDioxideLevel: v.data.co2Lvl,
+      VOCDensity: vocPPM2mgPm3(v.data.vocLvl),
+      CurrentTemperature: v.data.temperature,
+      CurrentRelativeHumidity: v.data.humidity,
    }
 
    jsonOut, _ := json.Marshal(AirQuality)
    //fmt.Printf("%s\n", jsonOut)
-   mqttClient.Publish(getTopic(v), 0, false, jsonOut)
+   m.m.Publish(v.getMQTTTopic(), 0, false, jsonOut)
 }

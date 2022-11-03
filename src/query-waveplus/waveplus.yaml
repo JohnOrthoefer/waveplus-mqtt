@@ -7,10 +7,10 @@ mqtt:
 monitor:
    - location: Kitchen
      serialnumber: 2930134792
-     topic: tele/Kitchen
+#     topic: tele/Kitchen
    - location: Basement
      serialnumber: 2930104730
-     topic: tele/Basement
+#     topic: tele/Basement
    - location: 2nd Floor
      serialnumber: 2930127493
      topic: tele/Upstairs

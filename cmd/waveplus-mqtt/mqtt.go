@@ -151,7 +151,7 @@ func (m *wavePlusMQTT) publish(v *waveplus) {
 
    jsonOut, _ := json.Marshal(AirQuality)
    //fmt.Printf("%s\n", jsonOut)
-   log.Printf("%d: Publishing to %s", v.sn, v.getMQTTTopic())
+   //log.Printf("%d: Publishing to %s", v.sn, v.getMQTTTopic())
    token := m.m.Publish(fmt.Sprintf("%s/sample", v.getMQTTTopic()), 0, false, jsonOut)
    token.Wait()
 }

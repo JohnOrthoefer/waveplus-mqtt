@@ -64,7 +64,7 @@ func (w *waveplus) getMonitorMAC(wait time.Duration) {
 
    must("enable BLE stack", adapter.Enable())
 
-   log.Printf("%d: Searching for monitor, %s", w.sn, w.location)
+   //log.Printf("%d: Searching for monitor, %s", w.sn, w.location)
 
    timeout := time.Now().Add(wait)
 	err := adapter.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
@@ -104,7 +104,7 @@ func (w *waveplus) getMonitorValues() bool {
 
    must("enable BLE stack", adapter.Enable())
 
-   log.Printf("%d: MAC %s", w.sn, w.mac.String())
+   //log.Printf("%d: MAC %s", w.sn, w.mac.String())
 
 	device, err := adapter.Connect(w.mac, bluetooth.ConnectionParams{})
    if err != nil {
@@ -139,6 +139,23 @@ func (w *waveplus) getMonitorValues() bool {
 
    device.Disconnect()
    return w.data.valid
+}
+
+func (w *waveplus) printMonitorSummery() {
+   if !w.data.valid {
+      return
+   }
+   var rtn = []string {
+      w.data.Quality().String(),
+      fmt.Sprintf("%.1f", convert2pCiL(w.data.radonShort))+"pCi/L",
+      fmt.Sprintf("%.1f", convert2pCiL(w.data.radonLong))+"pCi/L",
+      fmt.Sprintf("%.0f", w.data.vocLvl)+"ppb",
+      fmt.Sprintf("%.0f", w.data.co2Lvl)+"ppm",
+      fmt.Sprintf("%.1f", w.data.humidity)+"%rH",
+      fmt.Sprintf("%.1f", convert2F(w.data.temperature))+"F",
+      fmt.Sprintf("%.0f", w.data.pressure)+"hPa",
+   }
+   log.Printf("%s/%d: %s\n", w.getLocation(), w.sn, strings.Join(rtn, ","))
 }
 
 func (w *waveplus) printMonitorValues() {

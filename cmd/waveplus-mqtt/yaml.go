@@ -12,6 +12,7 @@ type Configuration struct {
    Freq     uint              `yaml:"frequency"`
    Timeout  uint              `yaml:"timeout"`
    Retries  uint              `yaml:"retries"`
+   Debug    bool              `yaml:"debug"`
    TSEnabled bool             `yaml:"timestamps"`
    MqttURL   string      `yaml:"mqtturl"`
    Monitor  []MonitorRecord   `yaml:"monitor"`
@@ -29,6 +30,7 @@ func ReadYAML() *Configuration {
       Freq: 60,
       Timeout: 60, 
       Retries: 3,
+      Debug: false,
       TSEnabled: true,
       MqttURL: "",
       Monitor: nil,
@@ -81,6 +83,10 @@ func (m MonitorRecord) GetLocation() string {
 
 func (c *Configuration) GetFrequency() time.Duration {
    return time.Second * time.Duration(c.Freq)
+}
+
+func (c *Configuration) GetDebug() bool {
+   return c.Debug
 }
 
 func (c *Configuration) GetTimeout() time.Duration {

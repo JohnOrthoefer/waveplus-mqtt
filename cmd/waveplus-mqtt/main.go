@@ -47,11 +47,14 @@ func main() {
          queue <- v
       }
       for v := range queue {
-         log.Printf("checking: %s\n", v.getLocation())
          v.getMonitorMAC(c.GetTimeout())
          if v.getMonitorValues() {
             broker.publish(v)
-            v.printMonitorValues()
+            if c.GetDebug() {
+               v.printMonitorValues()
+            } else {
+               v.printMonitorSummery()
+            }
          } else {
             v.retries += 1
             if v.retries < c.GetRetries() {
@@ -62,7 +65,8 @@ func main() {
             break
          }
       }
-      log.Printf("waiting")
-      time.Sleep(time.Until(thisRun.Add(c.GetFrequency())))
+      next:=thisRun.Add(c.GetFrequency())
+      log.Printf("Next sample at %s", next.Format("15:04:05"))
+      time.Sleep(time.Until(next))
    }
 }

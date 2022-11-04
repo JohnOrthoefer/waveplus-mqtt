@@ -1,0 +1,24 @@
+# WavePlus MQTT Bridge
+#
+# Install-
+#   useradd --system --shell /sbin/nologin waveplus
+#   cp waveplus_mqtt /usr/local/bin/
+#   cp waveplus.yaml /usr/local/etc/
+#   chown waveplus.waveplus /usr/local/bin/waveplus_mqtt /usr/local/etc/waveplus.yaml
+#   systemctl enable --now waveplus
+#
+[Unit]
+Description=Waveplus MQTT bridge
+After=network.target
+
+[Service]
+Type=simple
+User=waveplus
+Group=waveplus
+WorkingDirectory=/usr/local/etc
+EnvironmentFile=-/etc/sysconfig/waveplus
+EnvironmentFile=-/etc/default/waveplus
+ExecStart=/usr/local/bin/waveplus_mqtt
+
+[Install]
+WantedBy=multi-user.target

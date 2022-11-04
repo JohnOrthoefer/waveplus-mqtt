@@ -4,6 +4,7 @@ import (
    "fmt"
    "log"
    "time"
+   "strings"
    "strconv"
    "tinygo.org/x/bluetooth"
 )
@@ -33,6 +34,29 @@ func (m *waveplus) setLocation(l string) {
       return
    }
    m.location = l
+}
+
+func (m *waveplus) getLocation() string {
+   return m.location
+}
+
+func getLocations(m []*waveplus) string {
+   var rtn []string
+   for _, v := range m {
+      rtn = append(rtn, v.getLocation())
+   }
+   return strings.Join(rtn, ", ")
+}
+
+func (m *waveplus) getSerialNumber() uint {
+   return m.sn
+}
+
+func startScan() {
+   var adapter = bluetooth.DefaultAdapter
+
+   must("enable BLE stack", adapter.Enable())
+	go adapter.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {})
 }
 
 func (w *waveplus) getMonitorMAC(wait time.Duration) {
@@ -80,9 +104,11 @@ func (w *waveplus) getMonitorValues() bool {
 
    must("enable BLE stack", adapter.Enable())
 
+   log.Printf("%d: MAC %s", w.sn, w.mac.String())
+
 	device, err := adapter.Connect(w.mac, bluetooth.ConnectionParams{})
    if err != nil {
-      log.Printf("%d: Failed to Connect", w.sn)
+      log.Printf("%d: Failed to Connect, %s", w.sn, err.Error())
       return false
    }
 

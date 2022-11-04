@@ -38,17 +38,31 @@ func main() {
       log.Fatal("Nothing to monitor")
    }
 
+   queue := make(chan *waveplus, len(monLst))
+
    for {
       thisRun := time.Now()
       for _, v := range monLst {
-         if !v.ready() {
-            v.getMonitorMAC(c.GetTimeout())
-         }
+         v.retries = 0
+         queue <- v
+      }
+      for v := range queue {
+         log.Printf("checking: %s\n", v.getLocation())
+         v.getMonitorMAC(c.GetTimeout())
          if v.getMonitorValues() {
             broker.publish(v)
+            v.printMonitorValues()
+         } else {
+            v.retries += 1
+            if v.retries < c.GetRetries() {
+               queue <- v
+            }
          }
-         v.printMonitorValues()
+         if len(queue) == 0 {
+            break
+         }
       }
+      log.Printf("waiting")
       time.Sleep(time.Until(thisRun.Add(c.GetFrequency())))
    }
 }

@@ -11,6 +11,7 @@ import (
 type Configuration struct {
    Freq     uint              `yaml:"frequency"`
    Timeout  uint              `yaml:"timeout"`
+   Retries  uint              `yaml:"retries"`
    TSEnabled bool             `yaml:"timestamps"`
    MqttURL   string      `yaml:"mqtturl"`
    Monitor  []MonitorRecord   `yaml:"monitor"`
@@ -27,6 +28,7 @@ func ReadYAML() *Configuration {
    conf := Configuration {
       Freq: 60,
       Timeout: 60, 
+      Retries: 3,
       TSEnabled: true,
       MqttURL: "",
       Monitor: nil,
@@ -53,6 +55,10 @@ func (c *Configuration) Monitors() []MonitorRecord {
 
 func (c *Configuration) TimeStampsEnabled() bool {
    return c.TSEnabled
+}
+
+func (c *Configuration) GetRetries() uint {
+   return c.Retries
 }
 
 func (m MonitorRecord) SerialNumber() string {

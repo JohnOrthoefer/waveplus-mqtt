@@ -12,6 +12,7 @@ type waveplus struct {
    mqttTopic   string
    data     waveplusData 
    samples  uint64
+   retries  uint
    rssi  int16
 }
 

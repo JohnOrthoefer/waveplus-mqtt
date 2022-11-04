@@ -1,0 +1,31 @@
+#
+# waveplus.yaml
+#
+# example configuration
+
+# GLOBAL Configuration
+# timeout- wait for the bluetooth le beacon
+timeout: 30
+
+# frequancy- how often to probe
+frequancy: 90
+
+# timestamp- put timestamps in the output
+timestamps: false
+
+# debug- output more messages
+debug: false
+
+# mqtturl- URL to connect to
+mqtturl: tcp://localhost:1883
+
+# Per Monitor configuration
+monitor:
+     # location- text string making it more human identifable
+   - location: Kitchen
+     # serialnumber- serialnumber to look for
+     serialnumber: 2930123456
+     # topic to post the results from this sensor to
+     topic: tele/Kitchen
+
+

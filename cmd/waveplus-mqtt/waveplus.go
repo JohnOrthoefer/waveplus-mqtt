@@ -9,6 +9,8 @@ import (
    "tinygo.org/x/bluetooth"
 )
 
+var adapter = bluetooth.DefaultAdapter
+
 // 
 // 
 func newMonitor(m string) *waveplus {
@@ -53,15 +55,11 @@ func (m *waveplus) getSerialNumber() uint {
 }
 
 func startScan() {
-   var adapter = bluetooth.DefaultAdapter
-
    must("enable BLE stack", adapter.Enable())
 	go adapter.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {})
 }
 
 func (w *waveplus) getMonitorMAC(wait time.Duration) {
-   var adapter = bluetooth.DefaultAdapter
-
    must("enable BLE stack", adapter.Enable())
 
    //log.Printf("%d: Searching for monitor, %s", w.sn, w.location)
@@ -100,8 +98,6 @@ func (w *waveplus) getMonitorValues() bool {
    //log.Printf("%d: quering\n", w.sn)
    w.data.valid = false
 
-   var adapter = bluetooth.DefaultAdapter
-
    must("enable BLE stack", adapter.Enable())
 
    //log.Printf("%d: MAC %s", w.sn, w.mac.String())
@@ -139,6 +135,10 @@ func (w *waveplus) getMonitorValues() bool {
 
    device.Disconnect()
    return w.data.valid
+}
+
+func (w *waveplus) getTimestamp() time.Time {
+   return w.data.timestamp
 }
 
 func (w *waveplus) printMonitorSummery() {

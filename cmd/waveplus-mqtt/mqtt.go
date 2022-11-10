@@ -5,7 +5,7 @@ import (
    "log"
    "strings"
    "encoding/json"
-//   "net/url"
+   "time"
    "github.com/eclipse/paho.mqtt.golang"
 )
 
@@ -18,6 +18,7 @@ import (
 // https://github.com/michaelahern/homebridge-airthings
 type (
    AirQualityStruct struct {
+      Timestamp               string `json:"timestamp, omitempty"`
       // (Unknown, excellent, good, fair, inferior, poor)
       OverallAirQuality       string `json:"airquality,omitempty"`
 
@@ -136,6 +137,7 @@ func (m *wavePlusMQTT) publish(v *waveplus) {
       return
    }
    AirQuality := AirQualityStruct{
+      Timestamp: v.getTimestamp().Format(time.RFC822),
       OverallAirQuality: v.data.Quality().HKString(),
       CarbonDioxideLevel: v.data.co2Lvl,
       CarbonDioxideQuality: v.data.co2Quality().HKString(),

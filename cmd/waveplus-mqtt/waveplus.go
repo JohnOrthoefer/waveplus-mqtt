@@ -79,6 +79,8 @@ func (w *waveplus) getMonitorMAC(wait time.Duration) {
 	})
    if err != nil {
       log.Printf("Scan Fail %s", err)
+      log.Printf("reissuing stop")
+      adapter.StopScan()
    }
 }
 

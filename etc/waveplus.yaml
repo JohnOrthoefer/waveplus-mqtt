@@ -8,7 +8,7 @@
 timeout: 30
 
 # frequancy- how often to probe
-frequancy: 90
+frequency: 90
 
 # timestamp- put timestamps in the output
 timestamps: false

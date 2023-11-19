@@ -12,7 +12,8 @@ make all
 ```
 sudo useradd --system --shell /sbin/nologin waveplus
 sudo cp bin/waveplus_mqtt /usr/local/bin/
-sudo cp bin/waveplus.yaml /usr/local/etc/
+sudo cp etc/waveplus.yaml /usr/local/etc/
+sudo chown waveplus:waveplus /usr/local/etc/waveplus.yaml
 sudo cp etc/waveplus.server /etc/systemd/system/
 sudo nano /usr/local/etc/waveplus.yaml
 # add your 
